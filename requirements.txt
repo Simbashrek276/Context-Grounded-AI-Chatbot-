@@ -1,0 +1,8 @@
+# The AI model library and the deep-learning engine it runs on.
+# transformers is pinned below 5 because version 5 removed the simple
+# "question-answering" pipeline this project I built uses.
+transformers>=4.46,<5
+torch
+
+# Used to draw the confidence chart in confidence_scores.py.
+matplotlib
