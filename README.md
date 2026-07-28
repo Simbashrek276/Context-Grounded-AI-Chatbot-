@@ -1,45 +1,47 @@
 # Context-Grounded-AI-Chatbot
 
 This is a small chatbot I built that answers questions using **only** the notes
-you give it, and honestly says *"I couldn't find that"* when the answer isn't in
-those notes. I made it this way on purpose: most chatbots will happily make up a
-confident-sounding wrong answer, and if you're a student trusting it to study,
-that's a real problem. Mine either quotes the notes or admits it doesn't know.
+you give it. When the answer isn't in those notes, it just says
+*"I couldn't find that"* instead of guessing. I made it this way on purpose.
+Most chatbots will happily make up a confident-sounding wrong answer, and if
+you're a student trusting it to study, that's a real problem. Mine either quotes
+the notes or admits it doesn't know.
 
-Under the hood it's DistilBERT (extractive question answering) plus one
+Under the hood it uses DistilBERT (extractive question answering) plus a single
 confidence threshold that decides when to answer and when to back off.
 
 ## Being honest about what this is (and isn't)
 
-Before anything else — this is a learning project, and it has real limits I kept
-bumping into. I'd rather put them up front than pretend it's smarter than it is:
+Before anything else, I should say this is a learning project and it has real
+limits I kept bumping into. I'd rather put them up front than pretend it's
+smarter than it is.
 
-- **It can't actually reason.** It's *extractive*, which means it copies a span
-  of text straight out of the notes. It can't paraphrase, do arithmetic, combine
-  two facts, or explain anything in its own words. If the answer isn't already
-  sitting in the notes as a phrase, it simply can't produce it.
+- **It can't actually reason.** It's *extractive*, so it just copies a span of
+  text straight out of the notes. It can't paraphrase, do arithmetic, combine two
+  facts, or explain anything in its own words. If the answer isn't already sitting
+  in the notes as a phrase, it can't produce it.
 - **Confident doesn't mean correct.** The whole design leans on the confidence
   score, but the model is sometimes confidently wrong. On my 20 questions it gets
-  18 — and the two it misses, it answers *wrongly but with high confidence*, so
-  the threshold never catches them. That's the honest weak spot of the approach.
-- **The threshold is hand-tuned.** I landed on 0.15 by trying values against my
-  own questions. It works for my notes; it's not a magic number, and a different
-  set of notes would probably need a different one.
+  18 right. The two it misses, it answers wrongly but with high confidence, so the
+  threshold never catches them. That's the honest weak spot of the approach.
+- **The threshold is hand-tuned.** I landed on 0.15 by trying different values
+  against my own questions. It works for my notes, but it's not a magic number,
+  and a different set of notes would probably need a different one.
 - **The test set is tiny.** Twenty questions is enough to see the idea working,
-  not enough to claim a real accuracy figure. Treat "18/20" as a demo, not a
-  benchmark.
+  not enough to claim a real accuracy figure. Treat "18/20" as a demo rather than
+  a benchmark.
 - **It's picky about wording.** Ask the same thing a different way and the
   confidence can swing. The model is small and a few years old, so it matches
   patterns more than it understands meaning.
 
-None of that breaks the core idea — refusing when it's unsure — but it's the gap
+None of that breaks the core idea of refusing when it's unsure, but it is the gap
 between a class project like this and something you'd actually rely on.
 
 ## The idea, plainly
 
 1. You put a teacher's notes (plain `.txt` files) into the `documents/` folder.
-   You can add as many topics as you like — I use three (Vietnamese history, the
-   Solar System, and photosynthesis).
+   You can add as many topics as you like. I use three: Vietnamese history, the
+   Solar System, and photosynthesis.
 2. When you ask a question, the model looks through those notes and pulls out the
    piece of text that answers it, along with a confidence score.
 3. If that confidence is too low, the bot refuses instead of guessing. That
@@ -79,16 +81,16 @@ This is the part I care most about. To evaluate the bot, you run:
 python confidence_scores.py
 ```
 
-That asks 20 questions — sixteen answerable from the documents (across three
-topics) and four that aren't anywhere in them — and for each one prints the
-model's **confidence score**, the answer it picked, and whether that was correct.
-It finishes with an overall accuracy, a threshold sweep, and it saves
+That asks 20 questions. Sixteen are answerable from the documents (across three
+topics) and four aren't anywhere in them. For each one it prints the model's
+**confidence score**, the answer it picked, and whether that was correct. At the
+end it gives an overall accuracy and a threshold sweep, and it saves
 `confidence_chart.png`.
 
-On my documents it scores **18/20**: it answers the covered questions and refuses
-all four it shouldn't know. As I mentioned above, the two misses are questions it
-answers *confidently but wrongly* — that's exactly where this simple approach
-runs out of road. The chart still makes the main result clear: every answerable
+On my documents it scores **18/20**. It answers the covered questions and refuses
+all four it shouldn't know. Like I said above, the two misses are questions it
+answers confidently but wrongly, which is exactly where this simple approach runs
+out of road. The chart still makes the main result clear: every answerable
 question sits well above the threshold, while all four out-of-scope ones sit far
 below it.
 
@@ -96,12 +98,12 @@ below it.
 
 When the model answers, it returns a dictionary like
 `{'score': 0.917, 'answer': 'carbon dioxide', ...}`. The `score` is the
-confidence — how sure the model is about where the answer begins and ends. That's
-the exact value `chatbot.py` compares against its threshold, and the value
+confidence, meaning how sure the model is about where the answer begins and ends.
+That's the exact value `chatbot.py` compares against its threshold, and the value
 `confidence_scores.py` prints for every question.
 
 ## Making it answer about something else
 
-You don't need to touch any code. You just add or replace the `.txt` files in
+You don't need to touch any code. Just add or replace the `.txt` files in
 `documents/` with your own notes, update the questions in `confidence_scores.py`
-to match, and run it again — the bot now answers from your material instead.
+to match, and run it again. The bot now answers from your material instead.
