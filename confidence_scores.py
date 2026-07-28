@@ -76,7 +76,7 @@ def is_correct(expected, score, answer, threshold):
     return (not refused) and expected in answer.lower()# should have answered correctly
 
 
-# First I print a row per question at the normal threshold.
+#printing the results
 print(f"\n{'score':>6} | {'verdict':<8} | {'answer':<22} | question")
 print("-" * 90)
 correct = answered = 0
